@@ -1,10 +1,11 @@
 # Goodbye
 
 > It is a Turkish tradition to throw water behind a vehicle when the loved ones are setting out on a long journey.
-> 
-> The tradition itself serves to express a wish ——that the long journey will go smoothly, without mishap. As smooth as water.
+> The tradition itself serves to express a wish —that the long journey will go smoothly, without mishap. As smooth as water.
 
-`Goodbye` is a Python application, when someone unfollows you on Twitter, it will say them goodbye as long at it is running.
+![turkish tradition: throwing water](https://github.com/ahmetalpbalkan/goodbye/raw/master/img/promo.gif)
+
+**Goodbye** is a Python application, when someone unfollows you on Twitter, it will say them goodbye as long at it is running.
 
 ### Installation
 
