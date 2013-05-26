@@ -8,6 +8,7 @@ AUTH_CONFIG_FILE = "auth.config"
 GOODBYE_MESSAGE = "@%s sorry to see you unfollowing, goodbye!"
 POLL_INTERVAL_SECS = 60*5
 
+
 def main():
     config = {}
     try:
