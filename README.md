@@ -10,7 +10,7 @@
 ### Installation
 
 1. Clone this repository, go to source directory
-2. Install dependencies `pip install < requirements.txt`
+2. Install dependencies `pip install -r requirements.txt`
 3. Run program `./goodbye.py`
 
 When the program is run for the first time, it will ask for configuration regarding Twitter app  you will create and authentication tokens only once.
