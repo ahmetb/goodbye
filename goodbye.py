@@ -61,10 +61,7 @@ def main():
 
 
 def get_followers_ids(api):
-    follower_ids = set()
-    for friend in tweepy.Cursor(api.followers_ids).items():
-        follower_ids.add(friend)
-    return follower_ids
+    return set(tweepy.Cursor(api.followers_ids).items())
 
 
 def send_mention(api, user):
