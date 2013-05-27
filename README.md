@@ -31,10 +31,12 @@ Just terminate program with `Ctrl+C` to stop tracking.
 
 In `goodbye.py` file, there are configuration keys:
 
-    GOODBYE_MESSAGE = "@%s goodbye!"
     POLL_INTERVAL_SECS = 60*5
 
-You can customize goodbye message with `GOODBYE_MESSAGE` string. You can adjust Twitter API polling interval as well, e.g. defaults to 5 minutes above.
+You can adjust Twitter API polling interval as well, e.g. defaults to 5 minutes above.
+
+You can customize random goodbye messages by editing `messages.txt` by writing
+one message per line. Try to keep each message less than 110 characters.
 
 ## Demo
 

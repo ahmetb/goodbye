@@ -2,15 +2,25 @@
 # coding=utf-8
 import time
 import json
+import random
 import tweepy
 
 AUTH_CONFIG_FILE = "auth.config"
-GOODBYE_MESSAGE = "@%s sorry to see you unfollowing, goodbye!"
-POLL_INTERVAL_SECS = 60*5
-
+GOODBYE_MESSAGES_FILE = "messages.txt"
+POLL_INTERVAL_SECS = 20
 
 def main():
     config = {}
+    messages = []
+
+    try:
+        with open(GOODBYE_MESSAGES_FILE) as messages_file:
+            messages = [m.strip() for m in messages_file.readlines()]
+    except IOError: pass
+    if not messages:
+        print('No messages found in %s file' % GOODBYE_MESSAGES_FILE)
+        return
+
     try:
         with open(AUTH_CONFIG_FILE) as config_file:
             config = json.loads(config_file.read())
@@ -50,7 +60,7 @@ def main():
 
         for unfollower_id in diff:
             user = api.get_user(unfollower_id)
-            tweet = send_mention(api, user)
+            tweet = send_mention(api, user, messages)
             print('@%s (%s), sent mention http://twitter.com/%s'
                   % (user.screen_name, user.name, user.screen_name))
 
@@ -64,8 +74,15 @@ def get_followers_ids(api):
     return set(tweepy.Cursor(api.followers_ids).items())
 
 
-def send_mention(api, user):
-    return api.update_status(GOODBYE_MESSAGE % user.screen_name)
+def get_random(arr):
+    if arr:
+        random.shuffle(arr)
+        return arr[0]
+
+def send_mention(api, user, messages):
+    content = get_random(messages)
+    tweet = '@{0} {1}'.format(user.screen_name, content)
+    return api.update_status(tweet)
 
 if __name__ == '__main__':
     main()
