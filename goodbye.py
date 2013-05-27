@@ -7,7 +7,7 @@ import tweepy
 
 AUTH_CONFIG_FILE = "auth.config"
 GOODBYE_MESSAGES_FILE = "messages.txt"
-POLL_INTERVAL_SECS = 20
+POLL_INTERVAL_SECS = 5 * 60
 
 def main():
     config = {}
