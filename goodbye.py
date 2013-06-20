@@ -7,7 +7,8 @@ import tweepy
 
 AUTH_CONFIG_FILE = "auth.config"
 GOODBYE_MESSAGES_FILE = "messages.txt"
-POLL_INTERVAL_SECS = 5 * 60
+POLL_INTERVAL_SECS = 1 * 60
+
 
 def main():
     config = {}
@@ -16,7 +17,9 @@ def main():
     try:
         with open(GOODBYE_MESSAGES_FILE) as messages_file:
             messages = [m.strip() for m in messages_file.readlines()]
-    except IOError: pass
+    except IOError:
+        pass
+
     if not messages:
         print('No messages found in %s file' % GOODBYE_MESSAGES_FILE)
         return
@@ -52,32 +55,53 @@ def main():
     print('This will check every %d seconds until someone unfollows...'
           % POLL_INTERVAL_SECS)
 
+    mentioned = set()
+
     while True:
         time.sleep(POLL_INTERVAL_SECS)
 
         new_follower_ids = get_followers_ids(api)
-        diff = prev_follower_ids - new_follower_ids
+
+        diff = set()
+        if new_follower_ids:
+            diff = prev_follower_ids - new_follower_ids - mentioned
+            prev_follower_ids = new_follower_ids
 
         for unfollower_id in diff:
-            user = api.get_user(unfollower_id)
-            tweet = send_mention(api, user, messages)
-            print('@%s (%s), sent mention http://twitter.com/%s'
-                  % (user.screen_name, user.name, user.screen_name))
+            try:
+                user = get_twitter_user(api, unfollower_id)
+
+                if user:
+                    tweet = send_mention(api, user, messages)
+                    print('@%s (%s), sent mention http://twitter.com/%s'
+                          % (user.screen_name, user.name, user.screen_name))
+                    mentioned.add(unfollower_id)
+            except Exception as e:
+                print 'Cannot notify twitter user.', e
 
         if diff:
-            print('You have %d followers.' % len(new_follower_ids))
+            print('You have %d followers now.' % len(new_follower_ids))
 
-        prev_follower_ids = new_follower_ids
+
+def get_twitter_user(api, user_id):
+    try:
+        return api.get_user(user_id)
+    except Exception as e:
+        print 'Cannot fetch user with id {0}: {1}'.format(user_id, e)
 
 
 def get_followers_ids(api):
-    return set(tweepy.Cursor(api.followers_ids).items())
+    try:
+        return set(tweepy.Cursor(api.followers_ids).items())
+    except Exception as e:
+        print 'Cannot fetch followers:', e
 
 
 def get_random(arr):
     if arr:
         random.shuffle(arr)
         return arr[0]
+
 
 def send_mention(api, user, messages):
     content = get_random(messages)
