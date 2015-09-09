@@ -3,7 +3,7 @@
 **Goodbye** is a Python application, when someone unfollows you on Twitter,
 it will Direct Message you their twitter handle.
 
-### Installation the Docker way
+## Installation: the Docker way
 
 Make sure you have a Twitter OAuth(xAuth) credentials before you start.
 If not, run the program manually once and copy them from `auth.config` file
@@ -27,7 +27,7 @@ docker run -d --restart=always \
 
 Check if it is running fine: `docker logs -f goodbye-agent`.
 
-## Installation the hard way
+## Installation: the hard way
 
 1. Clone this repository, go to source directory
 2. Install dependencies `pip install -r requirements.txt`
