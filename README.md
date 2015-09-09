@@ -1,13 +1,33 @@
 # Goodbye
 
-> It is a Turkish tradition to throw water behind a vehicle when the loved ones are setting out on a long journey.
-> The tradition itself serves to express a wish —that the long journey will go smoothly, without mishap. As smooth as water.
+**Goodbye** is a Python application, when someone unfollows you on Twitter,
+it will Direct Message you their twitter handle.
 
-![turkish tradition: throwing water](https://github.com/ahmetalpbalkan/goodbye/raw/master/img/promo.gif)
+### Installation the Docker way
 
-**Goodbye** is a Python application, when someone unfollows you on Twitter, it will say them goodbye as long at it is running.
+Make sure you have a Twitter OAuth(xAuth) credentials before you start.
+If not, run the program manually once and copy them from `auth.config` file
+to the command below.
 
-### Installation
+Clone this repo and build an image:
+
+    $ docker build -t goodbye .
+
+Then run the container:
+
+```
+docker run -d --restart=always \
+    -e CONSUMER_KEY=<value> \
+    -e CONSUMER_SECRET=<value> \
+    -e ACCESS_TOKEN=<value> \
+    -e ACCESS_SECRET=<value> \
+    --name=goodbye-agent \
+    goodbye
+```
+
+Check if it is running fine: `docker logs -f goodbye-agent`.
+
+## Installation the hard way
 
 1. Clone this repository, go to source directory
 2. Install dependencies `pip install -r requirements.txt`
@@ -21,11 +41,8 @@ Go to https://dev.twitter.com/ , create an application and access tokens for it 
 
 ### How it works
 
-This program has to be running all the time to say goodbye to your unfollowers.
-
-Start program with `./goodbye.py` and keep it running. You can host this on your server, Raspberry Pi or some always running computer.
-
-Just terminate program with `Ctrl+C` to stop tracking.
+This program has to be running all the time to check list of your followers
+and take the diff. Therefore, make sure the program stays up all the time.
 
 ### Advanced Configuration
 
@@ -34,13 +51,6 @@ In `goodbye.py` file, there are configuration keys:
     POLL_INTERVAL_SECS = 60*5
 
 You can adjust Twitter API polling interval as well, e.g. defaults to 5 minutes above.
-
-You can customize random goodbye messages by editing `messages.txt` by writing
-one message per line. Try to keep each message less than 110 characters.
-
-## Demo
-
-Try following me [`@ahmetalpbalkan`](http://twitter.com/ahmetalpbalkan) on Twitter and unfollow 10 minutes later (works only if I keep this program running).
 
 ## Author
 

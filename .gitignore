@@ -1,8 +1,8 @@
+auth.config
+.DS_Store
+
 *.py[cod]
 *.db
-.DS_Store
-auth.config
-
 
 # C extensions
 *.so
