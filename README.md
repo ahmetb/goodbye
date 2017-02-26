@@ -3,7 +3,7 @@
 **Goodbye** is a Go application, when someone unfollows you on Twitter,
 it will Direct Message you their Twitter handle.
 
-## Installation: the Docker way
+## Installation with Docker
 
 Create a Twitter application on https://dev.twitter.com and access tokens
 for the application before you start. Then, create a `config.json` file with
@@ -33,12 +33,6 @@ docker run -d --restart=always \
 
 Check if it is running fine: `docker logs -f goodbye-agent`.
 
-## Installation: the hard way
-
-1. Clone this repository, go to source directory
-2. Install dependencies `pip install -r requirements.txt`
-3. Run program `./goodbye.py`
-
 ### Obtaining Twitter API Credentials
 
 Go to https://dev.twitter.com/, create an application and access tokens 
@@ -46,11 +40,12 @@ for it, then save those to a `config.json` described above.
 
 ### How it works
 
-This program has to be running all the time to check list of your followers
-and take the diff. Therefore, make sure the program stays up all the time.
+This program has to be running all the time to periodically download the
+list of your followers and compare it with the previous version to see
+who is no longer there (meaning, unfollowed you).
 
 ## Author
 
-Copyright (c) 2013-2016, [Ahmet Alp Balkan](http://ahmetalpbalkan.com)
+Copyright (c) 2013-2017, [Ahmet Alp Balkan](http://ahmetalpbalkan.com)
 
 Made in Bellevue, WA with love.
