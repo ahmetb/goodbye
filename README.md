@@ -44,6 +44,13 @@ This program has to be running all the time to periodically download the
 list of your followers and compare it with the previous version to see
 who is no longer there (meaning, unfollowed you).
 
+
+### Demo
+
+Here is how it looks like in action:
+
+![Goodbye program in action](http://i.imgur.com/FQr9Qjl.png)
+
 ## Author
 
 Copyright (c) 2013-2017, [Ahmet Alp Balkan](http://ahmetalpbalkan.com)
