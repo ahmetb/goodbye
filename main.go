@@ -24,8 +24,9 @@ type config struct {
 }
 
 func main() {
-	log := logger.NewContext(logger.NewSyncLogger(
-		logger.NewLogfmtLogger(os.Stdout))).WithPrefix("time", logger.DefaultTimestampUTC)
+	log := logger.WithPrefix(
+		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)),
+		"time", logger.DefaultTimestampUTC)
 
 	log.Log("msg", "reading configuration")
 	auth, err := readConfig(configPath())

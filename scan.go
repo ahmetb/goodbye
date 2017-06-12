@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func scan(log *logger.Context, api *anaconda.TwitterApi, self anaconda.User) error {
+func scan(log logger.Logger, api *anaconda.TwitterApi, self anaconda.User) error {
 	d, err := pollingInterval()
 	if err != nil {
 		return errors.Wrap(err, "cannot read polling interval")
@@ -52,7 +52,7 @@ func scan(log *logger.Context, api *anaconda.TwitterApi, self anaconda.User) err
 	}
 }
 
-func getFollowerIDs(log *logger.Context, api *anaconda.TwitterApi) ([]int64, error) {
+func getFollowerIDs(log logger.Logger, api *anaconda.TwitterApi) ([]int64, error) {
 	var out []int64
 
 	ch := api.GetFollowersIdsAll(url.Values{
