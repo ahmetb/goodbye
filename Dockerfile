@@ -1,5 +1,13 @@
-FROM golang:1.7-onbuild
-VOLUME /etc/goodbye/config.json
+FROM golang:1.11-alpine as builder
+RUN apk add --no-cache git
+WORKDIR /src/goodbye
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN env CGO_ENABLED=0 go build -o /app
 
-# override the entrypoint as go-wrapper logs some unstructured text
-ENTRYPOINT /go/bin/app
+FROM alpine
+RUN apk add --no-cache ca-certificates
+VOLUME /etc/goodbye/config.json
+COPY --from=builder /app /goodbye
+ENTRYPOINT /goodbye
