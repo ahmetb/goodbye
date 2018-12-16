@@ -33,9 +33,17 @@ docker run -d --restart=always \
 
 Check if it is running fine: `docker logs -f goodbye-agent`.
 
+**Extra configuration:** You can use `-e KEY=VALUE` format to "docker run" command
+to provide environment variables.
+
+* `GOODBYE_CONFIG_PATH` path to the config file. Defaults to
+  `/etc/goodbye/config.json`
+* `GOODBYE_POLLING_INTERVAL` API polling interval duration in Go time.Duration
+  format. Defaults to `5m`
+
 ### Obtaining Twitter API Credentials
 
-Go to https://dev.twitter.com/, create an application and access tokens 
+Go to https://dev.twitter.com/, create an application and access tokens
 for it, then save those to a `config.json` described above.
 
 ### How it works

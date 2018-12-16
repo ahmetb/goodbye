@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"net/url"
-
-	"github.com/ChimeraCoder/anaconda"
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 )
 
-func scan(log logger.Logger, api *anaconda.TwitterApi, self anaconda.User) error {
+func scan(log logger.Logger, api twitter, self twitterProfile) error {
 	d, err := pollingInterval()
 	if err != nil {
 		return errors.Wrap(err, "cannot read polling interval")
@@ -23,7 +20,7 @@ func scan(log logger.Logger, api *anaconda.TwitterApi, self anaconda.User) error
 	for c := time.Tick(d); ; <-c { // ticks immediately at start
 
 		log.Log("msg", "retrieving followers")
-		cur, err := getFollowerIDs(log, api)
+		cur, err := api.GetFollowerIDs()
 		if err != nil {
 			return errors.Wrap(err, "failed to fetch followers")
 		}
@@ -33,14 +30,14 @@ func scan(log logger.Logger, api *anaconda.TwitterApi, self anaconda.User) error
 			unfollowers := diff(prev, cur)
 			log.Log("diff", len(unfollowers))
 			for _, uid := range unfollowers {
-				u, err := api.GetUsersShowById(uid, nil)
+				u, err := api.GetUserByID(uid)
 				if err != nil {
 					log.Log("msg", "failed to fetch unfollower profile", "uid", uid, "error", err)
 					continue
 				}
 
-				log.Log("msg", "unfollower", "name", u.ScreenName, "id", u.IdStr)
-				if err := sendDM(api, self.ScreenName, u.ScreenName); err != nil {
+				log.Log("msg", "unfollower", "name", u.screenName, "id", u.idStr)
+				if err := sendDM(log, api, self.idStr, u.screenName); err != nil {
 					return errors.Wrap(err, "failed to send direct message")
 				}
 			}
@@ -50,22 +47,6 @@ func scan(log logger.Logger, api *anaconda.TwitterApi, self anaconda.User) error
 		prev = cur
 		log.Log("msg", "waiting until next run")
 	}
-}
-
-func getFollowerIDs(log logger.Logger, api *anaconda.TwitterApi) ([]int64, error) {
-	var out []int64
-
-	ch := api.GetFollowersIdsAll(url.Values{
-		"count": []string{"5000"}, // maximize responses in a page
-	})
-	for page := range ch {
-		if err := page.Error; err != nil {
-			return nil, err
-		}
-		out = append(out, page.Ids...)
-		log.Log("msg", "got page response", "n", len(page.Ids), "total", len(out))
-	}
-	return out, nil
 }
 
 // diff finds elements present in prev but not in cur.
@@ -85,8 +66,9 @@ func diff(prev, cur []int64) []int64 {
 }
 
 // sendDM sends the self a direct message indicating the user unfollowed.
-func sendDM(api *anaconda.TwitterApi, selfScreenName, unfollowerScreenName string) error {
+func sendDM(log logger.Logger, api twitter, selfID, unfollowerScreenName string) error {
+	log.Log("msg", "sending dm", "self_id", selfID)
 	msg := fmt.Sprintf("@%s unfollowed you.", unfollowerScreenName)
-	_, err := api.PostDMToScreenName(msg, selfScreenName)
-	return err
+	err := api.SendDM(selfID, msg)
+	return errors.Wrap(err, "failed to send DM")
 }

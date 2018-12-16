@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/ChimeraCoder/anaconda"
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 )
@@ -35,19 +34,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	api, err := mkClient(auth)
+	api, err := mkClient(log, auth)
 	if err != nil {
 		log.Log("msg", "failed to initialize api client", "error", err)
 		os.Exit(1)
 	}
 
 	log.Log("msg", "retrieving user profile")
-	me, err := api.GetSelf(nil)
+	me, err := api.Self()
 	if err != nil {
 		log.Log("msg", "failed to fetch user's own profile", "error", err)
 		os.Exit(1)
 	}
-	log.Log("msg", "authenticated", "self", me.ScreenName, "id", me.IdStr)
+	log.Log("msg", "authenticated", "screen_name", me.screenName, "id_str", me.idStr)
 
 	if err := scan(log, api, me); err != nil {
 		log.Log("error", err)
@@ -72,7 +71,7 @@ func configPath() string {
 	return defaultConfigFile
 }
 
-func mkClient(c config) (*anaconda.TwitterApi, error) {
+func mkClient(log logger.Logger, c config) (twitter, error) {
 	if c.ConsumerKey == "" {
 		return nil, errors.New("twitter: consumerKey is not set")
 	}
@@ -85,12 +84,7 @@ func mkClient(c config) (*anaconda.TwitterApi, error) {
 	if c.AccessTokenSecret == "" {
 		return nil, errors.New("twitter: accessSecret is not set")
 	}
-
-	anaconda.SetConsumerKey(c.ConsumerKey)
-	anaconda.SetConsumerSecret(c.ConsumerSecret)
-	api := anaconda.NewTwitterApi(c.AccessToken, c.AccessTokenSecret)
-	api.SetLogger(anaconda.BasicLogger)
-	return api, nil
+	return newGoTwitter(log, c), nil
 }
 
 func pollingInterval() (time.Duration, error) {
