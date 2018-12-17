@@ -1,4 +1,4 @@
-package main
+package gcf
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/goodbye/pkg/goodbyeutil"
+	"goodbye/pkg/goodbyeutil"
 )
 
 // GoodbyeHandler responds to GCF requests.

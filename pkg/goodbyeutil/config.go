@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ahmetb/goodbye/pkg/twitter"
+	"goodbye/pkg/twitter"
+
 	"github.com/pkg/errors"
 )
 

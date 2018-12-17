@@ -1,4 +1,4 @@
-module github.com/ahmetb/goodbye
+module goodbye
 
 require (
 	cloud.google.com/go v0.34.0
