@@ -35,7 +35,6 @@ func (g *GoTwitter) GetFollowerIDs() ([]int64, error) {
 
 	page := 0
 	for {
-		// g.log.Log("msg", "fetching follower ids", "page", page, "cursor", cursor)
 		ids, _, err := g.client.Followers.IDs(&gotw.FollowerIDParams{
 			Count:  5000,
 			Cursor: cursor})
@@ -45,13 +44,11 @@ func (g *GoTwitter) GetFollowerIDs() ([]int64, error) {
 
 		out = append(out, ids.IDs...)
 		cursor = ids.NextCursor
-		// g.log.Log("msg", "fetched follower ids", "page", page, "count", len(ids.IDs), "next_cursor", cursor)
 		if cursor == 0 {
 			break
 		}
 		page++
 	}
-	// g.log.Log("msg", "fetched all follower ids", "count", len(out))
 	return out, nil
 }
 
@@ -72,7 +69,6 @@ func (g *GoTwitter) SendDM(to, message string) error {
 	if err != nil {
 		return err
 	}
-	// g.log.Log("msg", "sent DM", "id", dm.ID)
 	return nil
 }
 

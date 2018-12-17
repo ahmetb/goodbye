@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -28,18 +27,18 @@ func run(log logger.Logger) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize")
 	}
-	log.Log("msg", "authenticated", "screen_name", me.ScreenName, "id", me.IDStr)
-	log.Log("msg", "starting to run periodically", "interval", interval)
+	log.Log("message", "authenticated", "screen_name", me.ScreenName, "id", me.IDStr)
+	log.Log("message", "starting to run periodically", "interval", interval)
 	err = goodbyeutil.RunLoop(log, api, me, interval)
 	return errors.Wrap(err, "run loop terminated with error")
 }
 
 func main() {
 	log := logger.WithPrefix(
-		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)), "time", logger.DefaultTimestampUTC)
+		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)), "timestamp", logger.DefaultTimestampUTC)
 
 	if err := run(log); err != nil {
-		fmt.Printf("error: %v\n", err)
+		log.Log("severity", "error", "error", err)
 		os.Exit(1)
 	}
 }

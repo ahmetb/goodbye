@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/storage"
 	logger "github.com/go-kit/kit/log"
@@ -19,42 +20,42 @@ import (
 
 // GoodbyeHandler responds to GCF requests.
 func GoodbyeHandler(w http.ResponseWriter, r *http.Request) {
+	s := time.Now()
 	log := logger.WithPrefix(
-		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)), "time", logger.DefaultTimestampUTC)
+		logger.NewSyncLogger(
+			logger.NewJSONLogger(os.Stdout)), "timestamp", logger.DefaultTimestampUTC)
+	log.Log("message", "starting run")
+	if err := run(r.Context(), log); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Log("severity", "error", "error", err)
+		fmt.Fprintf(w, "error: %+v", err)
+		return
+	}
+	d := time.Since(s)
+	fmt.Fprintf(w, "ok (request took %v)", d)
+}
+
+func run(ctx context.Context, log logger.Logger) error {
 	bucket, object, err := readGCSConfig()
 	if err != nil {
-		log.Log("error", err)
-		fmt.Fprintf(w, "ERROR: %+v", err)
-		return
+		return errors.Wrap(err, "failed to read gcs settings")
 	}
-
 	api, me, err := goodbyeutil.GetConfig()
 	if err != nil {
-		log.Log("error", err)
-		fmt.Fprintf(w, "ERROR: %+v", err)
-		return
+		return errors.Wrap(err, "failed to get config")
 	}
-
-	prev, err := loadIDs(r.Context(), bucket, object)
+	prev, err := loadIDs(ctx, bucket, object)
 	if err != nil {
-		log.Log("error", err)
-		fmt.Fprintf(w, "ERROR: %+v", err)
-		return
+		return errors.Wrap(err, "failed to load IDs")
 	}
-
 	cur, err := goodbyeutil.RunOnce(log, prev, api, me)
 	if err != nil {
-		log.Log("error", err)
-		fmt.Fprintf(w, "ERROR: %+v", err)
-		return
+		return errors.Wrap(err, "goodbye run failed")
 	}
-	if err := saveIDs(r.Context(), bucket, object, cur); err != nil {
-		log.Log("error", err)
-		fmt.Fprintf(w, "ERROR: %+v", err)
-		return
+	if err := saveIDs(ctx, bucket, object, cur); err != nil {
+		return errors.Wrap(err, "failed to save IDs")
 	}
-
-	fmt.Fprintf(w, "ok")
+	return nil
 }
 
 func readGCSConfig() (string, string, error) {
