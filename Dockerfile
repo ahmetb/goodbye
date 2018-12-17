@@ -4,7 +4,7 @@ WORKDIR /src/goodbye
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN env CGO_ENABLED=0 go build -o /app
+RUN env CGO_ENABLED=0 go build -o /app ./cmd/goodbye
 
 FROM alpine
 RUN apk add --no-cache ca-certificates

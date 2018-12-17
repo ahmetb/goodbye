@@ -3,24 +3,20 @@ package twitter
 import (
 	gotw "github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	logger "github.com/go-kit/kit/log"
 )
 
 // GoTwitter uses https://github.com/dghubble/go-twitter.
 type GoTwitter struct {
-	log    logger.Logger
 	client *gotw.Client
 }
 
 // NewGoTwitter initializes a go-twitter client.
-func NewGoTwitter(log logger.Logger, consumerKey, consumerSecret, accessToken, accessTokenSecret string) *GoTwitter {
+func NewGoTwitter(consumerKey, consumerSecret, accessToken, accessTokenSecret string) *GoTwitter {
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	token := oauth1.NewToken(accessToken, accessTokenSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
 	client := gotw.NewClient(httpClient)
-	return &GoTwitter{
-		log:    log,
-		client: client}
+	return &GoTwitter{client: client}
 }
 
 func (g *GoTwitter) Self() (TwitterProfile, error) {
@@ -39,7 +35,7 @@ func (g *GoTwitter) GetFollowerIDs() ([]int64, error) {
 
 	page := 0
 	for {
-		g.log.Log("msg", "fetching follower ids", "page", page, "cursor", cursor)
+		// g.log.Log("msg", "fetching follower ids", "page", page, "cursor", cursor)
 		ids, _, err := g.client.Followers.IDs(&gotw.FollowerIDParams{
 			Count:  5000,
 			Cursor: cursor})
@@ -49,18 +45,18 @@ func (g *GoTwitter) GetFollowerIDs() ([]int64, error) {
 
 		out = append(out, ids.IDs...)
 		cursor = ids.NextCursor
-		g.log.Log("msg", "fetched follower ids", "page", page, "count", len(ids.IDs), "next_cursor", cursor)
+		// g.log.Log("msg", "fetched follower ids", "page", page, "count", len(ids.IDs), "next_cursor", cursor)
 		if cursor == 0 {
 			break
 		}
 		page++
 	}
-	g.log.Log("msg", "fetched all follower ids", "count", len(out))
+	// g.log.Log("msg", "fetched all follower ids", "count", len(out))
 	return out, nil
 }
 
 func (g *GoTwitter) SendDM(to, message string) error {
-	dm, _, err := g.client.DirectMessages.EventsNew(&gotw.DirectMessageEventsNewParams{
+	_, _, err := g.client.DirectMessages.EventsNew(&gotw.DirectMessageEventsNewParams{
 		Event: &gotw.DirectMessageEvent{
 			Type: "message_create",
 			Message: &gotw.DirectMessageEventMessage{
@@ -76,7 +72,7 @@ func (g *GoTwitter) SendDM(to, message string) error {
 	if err != nil {
 		return err
 	}
-	g.log.Log("msg", "sent DM", "id", dm.ID)
+	// g.log.Log("msg", "sent DM", "id", dm.ID)
 	return nil
 }
 
