@@ -86,6 +86,9 @@ func loadIDs(ctx context.Context, bucket, object string) ([]int64, error) {
 	s := string(data)
 	var out []int64
 	for _, v := range strings.Split(s, "\n") {
+		if v == "" {
+			continue
+		}
 		i, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not parse id: %q", v)
