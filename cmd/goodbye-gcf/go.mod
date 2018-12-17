@@ -2,7 +2,6 @@ module github.com/ahmetb/goodbye/cmd/goodbye-gcf
 
 require (
 	cloud.google.com/go v0.34.0
-	github.com/ahmetb/goodbye/pkg/goodbyeutil v0.0.0-20181217080836-91c20a0fce30
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-kit/kit v0.8.0
 	github.com/google/martian v2.1.0+incompatible // indirect
