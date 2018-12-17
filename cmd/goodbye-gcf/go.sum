@@ -2,10 +2,10 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 cloud.google.com/go v0.34.0 h1:eOI3/cP2VTU6uZLDYAoic+eyzzB9YyGmJ7eIjl8rOPg=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 git.apache.org/thrift.git v0.0.0-20180902110319-2566ecd5d999/go.mod h1:fPE2ZNJGynbRyZ4dJvy6G277gSllfV2HJqblrnkyeyg=
-github.com/ahmetb/goodbye/pkg/goodbyeutil v0.0.0-20181217080836-91c20a0fce30 h1:521QMvPQhXIwfM401GfZf7oKiqtYuzlyhV0U+OsWuLg=
-github.com/ahmetb/goodbye/pkg/goodbyeutil v0.0.0-20181217080836-91c20a0fce30/go.mod h1:RShZMvMUyVMYMnuhbXcODE1tXo9uoFc2B0ZT6rT05uM=
-github.com/ahmetb/goodbye/pkg/twitter v0.0.0-20181217080731-865d484e6966 h1:y1mV1w+iU1lZLbAjDFMxFvVt17A9V0mjJ/5GpNHb6CM=
-github.com/ahmetb/goodbye/pkg/twitter v0.0.0-20181217080731-865d484e6966/go.mod h1:r2obqznH5fFgl5HTsad7oS9S4oEMwwuFz+SA8AGpyts=
+github.com/ahmetb/goodbye/pkg/goodbyeutil v0.0.0-20181217082855-161060a772a6 h1:jsMhBPn2V4PKSwDRAOMcXNLARL2yxGJx0PD29+VrfzI=
+github.com/ahmetb/goodbye/pkg/goodbyeutil v0.0.0-20181217082855-161060a772a6/go.mod h1:iiRwW5cCq0ZVBVONcQnPe1kTkod4kDUoK3tw/blP49o=
+github.com/ahmetb/goodbye/pkg/twitter v0.0.0-20181217082024-faffebe24c85 h1:HQAvB2eIXdUfjKL9W5+rfa33Ir5LFSZeomr6E2mJsqA=
+github.com/ahmetb/goodbye/pkg/twitter v0.0.0-20181217082024-faffebe24c85/go.mod h1:r2obqznH5fFgl5HTsad7oS9S4oEMwwuFz+SA8AGpyts=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/cenkalti/backoff v2.1.0+incompatible h1:FIRvWBZrzS4YC7NT5cOuZjexzFvIr+Dbi6aD1cZaNBk=
 github.com/cenkalti/backoff v2.1.0+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
