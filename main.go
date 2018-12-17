@@ -8,6 +8,9 @@ import (
 
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
+
+	"github.com/ahmetb/goodbye/pkg/goodbyeutil"
+	"github.com/ahmetb/goodbye/pkg/twitter"
 )
 
 const (
@@ -24,13 +27,17 @@ type config struct {
 
 func main() {
 	log := logger.WithPrefix(
-		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)),
-		"time", logger.DefaultTimestampUTC)
+		logger.NewSyncLogger(logger.NewLogfmtLogger(os.Stdout)), "time", logger.DefaultTimestampUTC)
 
 	log.Log("msg", "reading configuration")
 	auth, err := readConfig(configPath())
 	if err != nil {
 		log.Log("msg", "failed to read configuration", "error", err)
+		os.Exit(1)
+	}
+	d, err := pollingInterval()
+	if err != nil {
+		log.Log("msg", "cannot read polling interval", "error", "err")
 		os.Exit(1)
 	}
 
@@ -46,9 +53,10 @@ func main() {
 		log.Log("msg", "failed to fetch user's own profile", "error", err)
 		os.Exit(1)
 	}
-	log.Log("msg", "authenticated", "screen_name", me.screenName, "id_str", me.idStr)
+	log.Log("msg", "authenticated", "screen_name", me.ScreenName, "id", me.IDStr)
 
-	if err := scan(log, api, me); err != nil {
+	log.Log("msg", "starting to run periodically", "interval", d)
+	if err := goodbyeutil.RunLoop(log, api, me, d); err != nil {
 		log.Log("error", err)
 		os.Exit(1)
 	}
@@ -71,7 +79,7 @@ func configPath() string {
 	return defaultConfigFile
 }
 
-func mkClient(log logger.Logger, c config) (twitter, error) {
+func mkClient(log logger.Logger, c config) (twitter.Twitter, error) {
 	if c.ConsumerKey == "" {
 		return nil, errors.New("twitter: consumerKey is not set")
 	}
@@ -84,7 +92,7 @@ func mkClient(log logger.Logger, c config) (twitter, error) {
 	if c.AccessTokenSecret == "" {
 		return nil, errors.New("twitter: accessSecret is not set")
 	}
-	return newGoTwitter(log, c), nil
+	return twitter.NewGoTwitter(log, c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessTokenSecret), nil
 }
 
 func pollingInterval() (time.Duration, error) {
