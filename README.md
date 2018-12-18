@@ -68,12 +68,20 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
 1. Create a new Google Cloud Storage bucket to store follower IDs:
 
        BUCKET_NAME=pick-a-name
-       gsutil mb $BUCKET_NAME
+       gsutil mb gs://$BUCKET_NAME
 
 1. Upload an empty file named `ids` to GCS bucket
 
        touch ids
        gsutil cp ./ids gs://$BUCKET_NAME/ids
+
+1. View your function's details on Google Cloud Console, note its Service
+   Account field.
+
+1. Use `gcloud` to give service account of the GCF app permissions on the GCS
+   bucket:
+
+       gsutil iam ch serviceAccount:"$(gcloud config get-value core/project)"@appspot.gserviceaccount.com:objectAdmin gs://$BUCKET_NAME
 
 1. Use `gcloud` in this directory to create a function (change the
    `YOUR_BUCKET_NAME` occurrence below):
