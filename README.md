@@ -77,7 +77,7 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
        touch ids
        gsutil cp ./ids gs://BUCKET_NAME/ids
 
-1. Go to Google Cloud Console &rarr; Functions, create a new function:
+1. (Deploy via UI) Go to Google Cloud Console &rarr; Functions, create a new function:
 
    * Memory: 128MB
    * Runtime: Go
@@ -88,6 +88,17 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
      * `GOODBYE_CONFIG_PATH` = `config.json`
    * Upload ZIP you created above
    * Deploy!
+
+1. (Deploy via command-line) use `gcloud` in this directory to create a function:
+
+       gcloud alpha functions deploy goodbye \
+         --memory 128MB \
+         --trigger-http \
+         --region us-central1 \
+         --entry-point GoodbyeHandler \
+         --runtime go111 \
+         --set-env-vars GCS_BUCKET=YOUR_BUCKET_NAME,GCS_OBJECT=ids,GOODBYE_CONFIG_PATH=config.json
+
 
 1. Visit the function's URL and you should see an OK response.
 
