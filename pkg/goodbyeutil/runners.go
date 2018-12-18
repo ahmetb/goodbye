@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"goodbye/pkg/twitter"
+	"github.com/ahmetb/goodbye/pkg/twitter"
 
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"

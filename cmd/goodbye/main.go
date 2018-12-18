@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	"goodbye/pkg/goodbyeutil"
+	"github.com/ahmetb/goodbye/pkg/goodbyeutil"
 
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
