@@ -64,32 +64,19 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
 1. (Optional) If you have `go` installed, run `go build` here to see if it
    builds without any error messages.
 1. Copy your `config.json` file here.
-1. ZIP this directory:
-
-       zip -r gcf.zip .
 
 1. Create a new Google Cloud Storage bucket to store follower IDs:
 
-       gsutil mb YOUR_BUCKET_NAME
+       BUCKET_NAME=pick-a-name
+       gsutil mb $BUCKET_NAME
 
 1. Upload an empty file named `ids` to GCS bucket
 
        touch ids
-       gsutil cp ./ids gs://BUCKET_NAME/ids
+       gsutil cp ./ids gs://$BUCKET_NAME/ids
 
-1. (Deploy via UI) Go to Google Cloud Console &rarr; Functions, create a new function:
-
-   * Memory: 128MB
-   * Runtime: Go
-   * Trigger: HTTP
-   * Specify environment variables
-     * `GCS_BUCKET` = `YOUR_BUCKET_NAME` you picked above
-     * `GCS_OBJECT` = `ids`
-     * `GOODBYE_CONFIG_PATH` = `config.json`
-   * Upload ZIP you created above
-   * Deploy!
-
-1. (Deploy via command-line) use `gcloud` in this directory to create a function:
+1. Use `gcloud` in this directory to create a function (change the
+   `YOUR_BUCKET_NAME` occurrence below):
 
        gcloud alpha functions deploy goodbye \
          --memory 128MB \
@@ -97,10 +84,9 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
          --region us-central1 \
          --entry-point GoodbyeHandler \
          --runtime go111 \
-         --set-env-vars GCS_BUCKET=YOUR_BUCKET_NAME,GCS_OBJECT=ids,GOODBYE_CONFIG_PATH=config.json
+         --set-env-vars GCS_BUCKET=$BUCKET_NAME,GCS_OBJECT=ids,GOODBYE_CONFIG_PATH=config.json
 
-
-1. Visit the function's URL and you should see an OK response.
+1. Visit the function's trigger URL and you should see an OK response.
 
 1. Create a Google Cloud Scheduler job every 10 minutes to call the endpoint of
    your function.
