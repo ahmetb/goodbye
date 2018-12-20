@@ -15,7 +15,7 @@ import (
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 
-	"github.com/ahmetb/goodbye/pkg/goodbyeutil"
+	"github.com/ahmetb/goodbye/v3/pkg/goodbyeutil"
 )
 
 // GoodbyeHandler responds to GCF requests.
