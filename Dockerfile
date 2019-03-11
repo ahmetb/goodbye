@@ -8,6 +8,6 @@ RUN env CGO_ENABLED=0 go build -o /app ./cmd/goodbye
 
 FROM alpine
 RUN apk add --no-cache ca-certificates
-VOLUME /etc/goodbye/config.json
 COPY --from=builder /app /goodbye
-ENTRYPOINT /goodbye
+ENTRYPOINT ["/goodbye"]
+CMD ["-http-addr=ENV", "-followers-file=gs://ahmetb-goodbye/ids"]

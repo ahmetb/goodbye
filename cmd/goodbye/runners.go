@@ -1,18 +1,50 @@
-package goodbyeutil
+package main
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/ahmetb/goodbye/v3/pkg/twitter"
+	"github.com/ahmetb/goodbye/v4/pkg/twitter"
 
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
 )
 
-// RunOnce compares the user IDs given in prev to the current follower IDs and
-// sends a DM to the self about unfollowed users and runs
-func RunOnce(log logger.Logger, prev []int64, api twitter.Twitter, self twitter.TwitterProfile) ([]int64, error) {
+// runLoop executes RunOnce periodically with given interval while preserving
+// the follower counts in memory.
+func runLoop(log logger.Logger, api twitter.Twitter, self twitter.TwitterProfile, interval time.Duration) error {
+	var prev []int64
+	log.Log("message", "starting loop", "interval", interval)
+	for c := time.Tick(interval); ; <-c { // ticks immediately at start
+		cur, err := run(log, prev, api, self)
+		if err != nil {
+			return err
+		}
+		prev = cur
+		log.Log("message", "waiting until next run", "followers", len(cur))
+	}
+}
+
+// runOnce executes the check loop once by reading the known follower list from
+// the specified file and saves the reslts back to the specified file
+func runOnce(log logger.Logger, api twitter.Twitter, self twitter.TwitterProfile, f file) error {
+	log.Log("severity", "debug", "message", "loading previous IDs from file")
+	prevIDs, err := loadIDs(f)
+	if err != nil {
+		return errors.Wrap(err, "failed to load current IDs")
+	}
+
+	curIDs, err := run(log, prevIDs, api, self)
+	if err != nil {
+		return errors.Wrap(err, "failed to run check")
+	}
+
+	err = saveIDs(f, curIDs)
+	return errors.Wrap(err, "failed to save fetched list of followers")
+}
+
+func run(log logger.Logger, prev []int64, api twitter.Twitter, self twitter.TwitterProfile) ([]int64, error) {
+	log.Log("severity", "debug", "message", "fetching follower list")
 	cur, err := api.GetFollowerIDs()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch followers")
@@ -36,20 +68,6 @@ func RunOnce(log logger.Logger, prev []int64, api twitter.Twitter, self twitter.
 		}
 	}
 	return cur, nil
-}
-
-// RunLoop executes RunOnce periodically with given interval while preserving
-// the follower counts in memory.
-func RunLoop(log logger.Logger, api twitter.Twitter, self twitter.TwitterProfile, interval time.Duration) error {
-	var prev []int64
-	for c := time.Tick(interval); ; <-c { // ticks immediately at start
-		cur, err := RunOnce(log, prev, api, self)
-		if err != nil {
-			return err
-		}
-		prev = cur
-		log.Log("message", "waiting until next run", "followers", len(cur))
-	}
 }
 
 // diff finds elements present in prev but not in cur.

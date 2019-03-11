@@ -3,32 +3,44 @@
 **Goodbye** is a Go application, when someone unfollows you on Twitter,
 it will Direct Message you their Twitter handle.
 
-It can be run as a daemon that checks your account for unfollowers every 5
-minutes (with Docker support), or as a serverless function on Google Cloud
-Functions (GCF) with periodic invocation through Google Cloud Scheduler.
+At its core, it’s a program that downloads your twitter follower list in certain
+intervals, and compares it with the previous list to find out who has unfollowed
+you.
 
-## Installation
+It has the following execution modes:
+
+- **`-daemon`**: Process continously runs and fetches the followers every 5
+  minutes (or specified `$GOODBYE_POLLING_INTERVAL`). Doesn't need extra storage
+  to store followers list (stores in-memory).
+
+- **`-http-addr`:** Process listens on specified port and checks follower list
+  on each request to `GET /goodbye`. Needs extra storage (currently a GCS
+  bucket) to store follower list. (Suitable for serverless environments)
+
+- **`-run-once:`** Process runs once and exits. Needs extra storage (currently
+  a GCS bucket) to store follower list. (Suitable for cronjobs.)
+
+## Setup
 
 First, you will need a `config.json` file containing Twitter API credentials.
 
 Create a Twitter application on https://dev.twitter.com and access tokens for
-the application. Then, create a `config.json` file with in the format:
+the application. Save these and pass as environment variables to the
+application:
 
-```json
-{
-  "consumerKey": "<value>",
-  "consumerSecret": "<value>",
-  "accessToken": "<value>",
-  "accessSecret": "<value>"
-}
+```sh
+export CONSUMER_KEY=[...] \
+       CONSUMER_SECRET=[...] \
+       ACCESS_TOKEN=[...] \
+       ACCESS_TOKEN_SECRET=[...]
+
+./goodbye -daemon
 ```
 
-You have two options:
+You can compile the application with Go compiler, or use the Dockerfile to build
+a container image.
 
-1. Run as a Docker container (requires an always-on Linux machine)
-2. Run as a serverless function (requires Google Cloud Functions)
-
-### Option 1: Installation with Docker
+### Run with Docker
 
 Clone this repo on a Linux server with docker installed and build the Docker
 image in the repository root directory:
@@ -37,33 +49,25 @@ image in the repository root directory:
 docker build -t goodbye .
 ```
 
-Then run the container (specify path to `config.json` in `-v` argument):
+Then run the container and give it the arguments it needs.
 
 ```sh
 docker run -d --restart=always \
-    -v /your/path/to/config.json:/etc/goodbye/config.json \
+    -e CONSUMER_KEY=[...] \
+    -e CONSUMER_SECRET=[...] \
+    -e ACCESS_TOKEN=[...] \
+    -e ACCESS_TOKEN_SECRET=[...] \
     --name=goodbye-agent \
-    goodbye
+       goodbye -daemon
 ```
 
 Check if it is running fine: `docker logs -f goodbye-agent`.
 
-You can use `-e KEY=VALUE` format to "docker run" command to customize some
-parameters through environment variables:
+## Set up follower ID storage (for `-run-once` and `-http-addr` modes)
 
-* `GOODBYE_CONFIG_PATH` path to the config file (defaults to
-  `/etc/goodbye/config.json`)
-* `GOODBYE_POLLING_INTERVAL` API polling interval duration in Go time.Duration
-  format (defaults to `5m`)
-
-### Option 2: Run as a serverless function on Google Cloud Functions
-
-This is how I run it (recommended!) and it costs nearly 0$/month.
-
-1. Clone this repo and navigate to `cmd/gcf` directory.
-1. (Optional) If you have `go` installed, run `go build` here to see if it
-   builds without any error messages.
-1. Copy your `config.json` file here.
+The `-daemon` mode stores the follower IDs in memory, however other modes need
+external storage (currently only Google Cloud Storage is supported) to store
+the follower IDs.
 
 1. Create a new Google Cloud Storage bucket to store follower IDs:
 
@@ -75,38 +79,7 @@ This is how I run it (recommended!) and it costs nearly 0$/month.
        touch ids
        gsutil cp ./ids gs://$BUCKET_NAME/ids
 
-1. View your function's details on Google Cloud Console, note its Service
-   Account field.
-
-1. Use `gcloud` to give service account of the GCF app permissions on the GCS
-   bucket:
-
-       gsutil iam ch serviceAccount:"$(gcloud config get-value core/project)"@appspot.gserviceaccount.com:objectAdmin gs://$BUCKET_NAME
-
-1. Use `gcloud` in this directory to create a function (change the
-   `YOUR_BUCKET_NAME` occurrence below):
-
-       gcloud alpha functions deploy goodbye \
-         --memory 128MB \
-         --trigger-http \
-         --region us-central1 \
-         --entry-point GoodbyeHandler \
-         --runtime go111 \
-         --set-env-vars GCS_BUCKET=$BUCKET_NAME,GCS_OBJECT=ids,GOODBYE_CONFIG_PATH=config.json
-
-1. Visit the function's trigger URL and you should see an OK response.
-
-1. Create a Google Cloud Scheduler job every 10 minutes to call the endpoint of
-   your function.
-
-### How it works
-
-This program runs periodically download the list of your followers and compare
-it with the previous version to see who is no longer there (meaning, unfollowed
-you). Then it sends a DM to your with their twitter @username.
-
-If you followed Option 1 (docker container), the machine should be running all
-the time so the program can check the follower list every 5 minutes.
+Use this `gs://my_bucket/ids` value as the `-followers-file` argument.
 
 ### Demo
 
