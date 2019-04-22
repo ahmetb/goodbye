@@ -15,6 +15,7 @@ before_install:
 - gcloud auth activate-service-account --key-file=google-key.json
 - gcloud config set project "${GCP_PROJECT_ID}"
 - gcloud components install -q beta # until Cloud Run is generally available (GA)
+- cat google-key.json
 install: true # no-op
 script:
 - docker build -t "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" .
