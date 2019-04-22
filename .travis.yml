@@ -1,0 +1,28 @@
+services: docker
+env:
+  global:
+  - GCP_PROJECT_ID=ahmet-personal-api
+  - CLOUD_RUN_REGION=us-central1
+  - CLOUD_RUN_SERVICE=goodbye
+  - CONTAINER_IMAGE=gcr.io/ahmet-personal-api/goodbye
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1 
+before_install:
+- > # TODO replace the "true" below with the command provided in "travis encrypt-file" step
+  openssl aes-256-cbc -K $encrypted_fbfaf42b268c_key -iv $encrypted_fbfaf42b268c_iv -in google-key.json.enc -out google-key.json -d
+- | # install google cloud sdk (gcloud)
+  curl https://sdk.cloud.google.com | bash > /dev/null && \
+    source "$HOME/google-cloud-sdk/path.bash.inc" && \
+    gcloud auth configure-docker -q && \
+    gcloud auth activate-service-account --key-file=google-key.json && \
+    gcloud config set project "${GCP_PROJECT_ID}"
+- > # install Cloud Run commands separately (as they're currently in beta)
+  gcloud components install -q beta
+install: true # no-op
+script:
+- docker build -t "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" .
+- docker push "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}"
+- | # deploy the pushed image
+  gcloud beta run deploy -q "${CLOUD_RUN_SERVICE}" \
+    --image="${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" \
+    --region="${CLOUD_RUN_REGION}" \
+    --allow-unauthenticated 
