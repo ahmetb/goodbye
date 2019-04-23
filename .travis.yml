@@ -13,20 +13,20 @@ before_install:
 - source "$HOME/google-cloud-sdk/path.bash.inc"
 - gcloud auth configure-docker -q
 - gcloud auth activate-service-account --key-file=google-key.json
-- gcloud config set project "${GCP_PROJECT_ID}"
+- gcloud config set project "${GCP_PROJECT_ID?}"
 - gcloud components install -q beta # until Cloud Run is generally available (GA)
 install: true # no-op
 script:
-- docker build -t "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" .
-- docker push "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}"
+- docker build -t "${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}" .
+- docker push "${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}"
 - | # deploy the pushed image to Cloud Run
   gcloud beta run deploy "goodbye" \
-    --image="${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" \
+    --image="${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}" \
     --allow-unauthenticated \
-    --region="${CLOUD_RUN_REGION}" \
+    --region="${CLOUD_RUN_REGION?}" \
     --memory=512Mi \
     --concurrency=1 \
-    --set-env-vars="CONSUMER_KEY=berglas://${BERGLAS_SECRETS_BUCKET}/CONSUMER_KEY,\
-  CONSUMER_SECRET=berglas://${BERGLAS_SECRETS_BUCKET}/CONSUMER_SECRET,\
-  ACCESS_TOKEN=berglas://${BERGLAS_SECRETS_BUCKET}/ACCESS_TOKEN,\
-  ACCESS_TOKEN_SECRET=berglas://${BERGLAS_SECRETS_BUCKET}/ACCESS_TOKEN_SECRET"
+    --set-env-vars="CONSUMER_KEY=berglas://${BERGLAS_SECRETS_BUCKET?}/CONSUMER_KEY,\
+  CONSUMER_SECRET=berglas://${BERGLAS_SECRETS_BUCKET?}/CONSUMER_SECRET,\
+  ACCESS_TOKEN=berglas://${BERGLAS_SECRETS_BUCKET?}/ACCESS_TOKEN,\
+  ACCESS_TOKEN_SECRET=berglas://${BERGLAS_SECRETS_BUCKET?}/ACCESS_TOKEN_SECRET"
