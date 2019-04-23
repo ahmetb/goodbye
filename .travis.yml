@@ -8,8 +8,7 @@ env:
   - CLOUDSDK_CORE_DISABLE_PROMPTS=1
   - BERGLAS_SECRETS_BUCKET=secrets-goodbye
 before_install:
-- > # TODO replace the following line with the command provided from "travis encrypt-file [...]" step.
-  openssl aes-256-cbc -K $encrypted_fbfaf42b268c_key -iv $encrypted_fbfaf42b268c_iv -in google-key.json.enc -out google-key.json -d
+- openssl aes-256-cbc -K $encrypted_ebc3448c04ae_key -iv $encrypted_ebc3448c04ae_iv -in google-key.json.enc -out google-key.json -d
 - curl https://sdk.cloud.google.com | bash > /dev/null
 - source "$HOME/google-cloud-sdk/path.bash.inc"
 - gcloud auth configure-docker -q
