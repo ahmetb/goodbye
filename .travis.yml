@@ -23,7 +23,7 @@ script:
   gcloud beta run deploy "goodbye" \
     --image="${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" \
     --allow-unauthenticated \
-    --region="${CLOUD_RUNREGION}" \
+    --region="${CLOUD_RUN_REGION}" \
     --memory=512Mi \
     --concurrency=1 \
     --set-env-vars="CONSUMER_KEY=berglas://${BERGLAS_SECRETS_BUCKET}/CONSUMER_KEY,\
