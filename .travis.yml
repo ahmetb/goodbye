@@ -20,7 +20,7 @@ script:
 - docker build -t "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" .
 - docker push "${CONTAINER_IMAGE}:${TRAVIS_COMMIT}"
 - | # deploy the pushed image to Cloud Run
-  gcloud alpha run deploy "goodbye" \
+  gcloud beta run deploy "goodbye" \
     --image="${CONTAINER_IMAGE}:${TRAVIS_COMMIT}" \
     --allow-unauthenticated \
     --region="${CLOUD_RUNREGION}" \
