@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/ahmetb/goodbye/v4/pkg/twitter"
+	_ "github.com/GoogleCloudPlatform/berglas/pkg/auto"
 
 	logger "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
