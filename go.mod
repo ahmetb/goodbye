@@ -2,7 +2,7 @@ module github.com/ahmetb/goodbye/v4
 
 require (
 	cloud.google.com/go v0.37.4
-	github.com/GoogleCloudPlatform/berglas v0.1.1
+	github.com/GoogleCloudPlatform/berglas v0.1.2-0.20190426162344-ea5ca1769ce2
 	github.com/cenkalti/backoff v2.1.1+incompatible // indirect
 	github.com/dghubble/go-twitter v0.0.0-20181130234017-22c4b7bc9a27
 	github.com/dghubble/oauth1 v0.5.0
