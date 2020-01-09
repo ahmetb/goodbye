@@ -14,13 +14,13 @@ before_install:
 - gcloud auth configure-docker -q
 - gcloud auth activate-service-account --key-file=google-key.json
 - gcloud config set project "${GCP_PROJECT_ID?}"
-- gcloud components install -q beta # until Cloud Run is generally available (GA)
 install: true # no-op
 script:
 - docker build -t "${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}" .
 - docker push "${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}"
 - | # deploy the pushed image to Cloud Run
-  gcloud beta run deploy "goodbye" \
+  gcloud run deploy "goodbye" \
+    --platform=managed \
     --image="${CONTAINER_IMAGE?}:${TRAVIS_COMMIT?}" \
     --allow-unauthenticated \
     --region="${CLOUD_RUN_REGION?}" \
