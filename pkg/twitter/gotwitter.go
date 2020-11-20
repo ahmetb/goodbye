@@ -78,6 +78,9 @@ func (g *GoTwitter) GetUserByID(id int64) (TwitterProfile, error) {
 		return TwitterProfile{}, err
 	}
 	return TwitterProfile{
-		ScreenName: u.ScreenName,
-		IDStr:      u.IDStr}, nil
+		ScreenName:     u.ScreenName,
+		IDStr:          u.IDStr,
+		FollowerCount:  u.FollowersCount,
+		FollowingCount: u.FriendsCount,
+	}, nil
 }

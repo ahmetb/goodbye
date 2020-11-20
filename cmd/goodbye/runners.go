@@ -63,7 +63,7 @@ func run(log logger.Logger, prev []int64, api twitter.Twitter, self twitter.Twit
 		}
 
 		log.Log("message", "unfollower", "name", u.ScreenName, "id", u.IDStr)
-		if err := sendDM(log, api, self.IDStr, u.ScreenName); err != nil {
+		if err := sendDM(log, api, self.IDStr, u); err != nil {
 			return nil, errors.Wrap(err, "failed to send direct message")
 		}
 	}
@@ -87,9 +87,11 @@ func diff(prev, cur []int64) []int64 {
 }
 
 // sendDM sends the self a direct message indicating the user unfollowed.
-func sendDM(log logger.Logger, api twitter.Twitter, selfID, unfollowerScreenName string) error {
+func sendDM(log logger.Logger, api twitter.Twitter,
+	selfID string, unfollower twitter.TwitterProfile) error {
 	log.Log("message", "sending dm", "self_id", selfID)
-	msg := fmt.Sprintf("@%s unfollowed you.", unfollowerScreenName)
+	msg := fmt.Sprintf("@%s unfollowed you. (%d/%d)",
+		unfollower.ScreenName, unfollower.FollowingCount, unfollower.FollowerCount)
 	err := api.SendDM(selfID, msg)
 	return errors.Wrap(err, "failed to send DM")
 }

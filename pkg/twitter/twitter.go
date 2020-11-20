@@ -8,6 +8,8 @@ type Twitter interface {
 }
 
 type TwitterProfile struct {
-	IDStr      string
-	ScreenName string
+	IDStr          string
+	ScreenName     string
+	FollowerCount  int
+	FollowingCount int
 }
